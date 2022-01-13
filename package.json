@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Jojohersh/synthaesthesia#readme",
   "dependencies": {
+    "@tonaljs/tonal": "^4.6.5",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^10.0.0",
