@@ -20,20 +20,25 @@ $("#fileButton").on("click", function() {
 $("#fileInput").on("change", async function() {
   var file = $("#fileInput")[0].files[0];
   colorData.imageUrl = fileToDataUrl(file);
-  draw(colorData.imageUrl)
-  .then(() => {
-    console.log("draw().then()");
-    // NEED setTimeout....
-    //canvas wouldn't finish rendering before we need pixel data
-    setTimeout(function () {
-      grabColorData()
-      .then((colorChunks) => {
-        colorData.chunks = colorChunks.slice();
-      }).then(() => {
-        sendToSongify(colorData.chunks);
-      });
-    }, 75);
-  });
+  draw(colorData.imageUrl);
+  // NEED setTimeout....
+  //canvas wouldn't finish rendering before we need pixel data
+  setTimeout(function () {
+    grabColorData()
+    .then(async (colorChunks) => {
+      colorData.chunks = colorChunks.slice();
+
+      var clips = await sendToSongify(colorData.chunks);
+      console.log(clips);
+      // sendToSongify(colorData.chunks)
+      // .then((clips)=> {
+      //   console.log(`clips after the songify ${clips}`);
+      // })
+      // .catch((reason) => {
+      //   console.error(reason);
+      // });
+    });
+  }, 75);
 });
 
 //**************************************************************************
@@ -42,23 +47,33 @@ $("#fileInput").on("change", async function() {
 //
 //**************************************************************************
 async function sendToSongify(data) {
+  return new Promise((resolve, reject) => {
+    var request = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    };
 
-  var request = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  };
   //checking the results of JSON.stringify
-  console.log(request);
+  // console.log(request);
 
-  fetch("/songify", request)
-  .then((response) => {
-    response.text()
-    .then((responseText)=>{
+    fetch("/songify", request)
+    .then((response) => {
+      response.text()
+      .then((responseText)=>{
       // here the response body has been converted into readable text
-      console.log(responseText);
+      // console.log(responseText);
+        var clips = JSON.parse(responseText);
+        // console.log(`clips inside the promise: ${clips}`);
+        // console.log(clips);
+        if (clips !== null) {
+          resolve(clips);
+        } else {
+          reject("error communicating with songify route");
+        }
+      });
     });
   });
 }
@@ -167,7 +182,15 @@ async function grabColorData() {
       chunks.push(chunk);
     }
   }
-  return chunks;
+  var p = new Promise((resolve, reject) => {
+    if (chunks !== null && chunks.length > 0) {
+      resolve(chunks);
+    } else {
+      reject("error grabbing color data");
+    }
+  });
+
+  return p;
 }
 // ***************************************************************
 // String findAvgRGB(Array rgbaData)
