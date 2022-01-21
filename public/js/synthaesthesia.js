@@ -1,12 +1,14 @@
 var canvas = $("canvas")[0];
 var context = canvas.getContext("2d");
 
+
 var colorData = {
   orientation: "landscape",
   chunkWidth: 50,
   chunkHeight: 50,
   imageUrl: "",
   chunks: [],
+  formattedClips: [],
   getColorData: function() {
     return this.chunks;
   }
@@ -18,28 +20,77 @@ $("#fileButton").on("click", function() {
 
 //when the file input state changes check if it has the right kind of file
 $("#fileInput").on("change", async function() {
+  //stop current music
+  Tone.Transport.stop();
+  //clear previously loaded music
+  console.log(Tone.Transport);
   var file = $("#fileInput")[0].files[0];
   colorData.imageUrl = fileToDataUrl(file);
   draw(colorData.imageUrl);
   // NEED setTimeout....
   //canvas wouldn't finish rendering before we need pixel data
   setTimeout(function () {
+    // grabs all the pixel averages throughout the picture
     grabColorData()
     .then(async (colorChunks) => {
+      //copies colorChunk array into global object colorData
+      //TODO ... not sure if necessary, will get back to
       colorData.chunks = colorChunks.slice();
-
+      // waits on data to be sent back to server, converted to music clips, and sent back to client
       var clips = await sendToSongify(colorData.chunks);
-      console.log(clips);
-      // sendToSongify(colorData.chunks)
-      // .then((clips)=> {
-      //   console.log(`clips after the songify ${clips}`);
-      // })
-      // .catch((reason) => {
-      //   console.error(reason);
-      // });
+
+      colorData.formattedClips = await clips.map( clip => scribble.clip(clip));
+      // console.log(scribbledClips);
+      showPlayButton();
     });
   }, 75);
 });
+
+function showPlayButton() {
+  var playButton = document.getElementById("play");
+  playButton.classList.remove("hidden");
+
+  playButton.addEventListener("click", async () => {
+    playSong(colorData.formattedClips);
+    console.log("play button clicked");
+  });
+}
+
+function hidePlayButton() {
+  var playButton = document.getElementById("play");
+  playButton.classList.add("hidden");
+}
+
+function playSong(clips) {
+  // maybe one day I'll have a drum backing track...
+
+  // var drumKick = scribble.clip({
+  //   instrument: "Synth",
+  //   subdiv: 8n,
+  //   pattern: "x-x-x-x-",
+  //   notes: ["C3"]
+  // });
+  // drumKick._loop = true;
+  // drumKick.loopStart("0m");
+  // drumKick.loopEnd("100m");
+
+  // clips.map(entry => entry.start());
+  for(let i=0; i<clips.length; i++) {
+    clips[i]._loop = false;
+    clips[i].start(i + "m");
+    clips[i].stop( (i+1)+"m");
+  }
+  // console.log(clips[0]);
+  // clips[0].start();
+
+
+  Tone.context.resume().then(() => {
+    console.log(Tone.Transport);
+    Tone.Transport.loop = false;
+    Tone.Transport.start();
+  });
+}
+
 
 //**************************************************************************
 // sends a fetch post request to server with the rgb data to be converted to
@@ -176,7 +227,8 @@ async function grabColorData() {
       var chunk = avgRGB;
 
       //draw the avg pixel color
-      drawAvgRGBRect(chunkX,chunkY,chunkW,chunkH,avgRGB);
+      // drawAvgRGBRect(chunkX,chunkY,chunkW,chunkH,avgRGB);
+
       // store the chunk data
       var chunksIndex = x*10 + y;
       chunks.push(chunk);

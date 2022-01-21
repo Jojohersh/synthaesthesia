@@ -13,7 +13,7 @@ router.post("/songify", (req,res)=> {
   // console.log(req.body);
   // songify.songify("hello");
   var clips = songify.songify(req.body);
-  console.log(clips);
+  // console.log(clips);
 
   var jsonClips = JSON.stringify(clips);
 

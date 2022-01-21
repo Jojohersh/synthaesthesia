@@ -1,5 +1,5 @@
 body {
-  background: #2f2f2f;
+  background: #202d2a;
 }
 #title {
   color: white;
@@ -27,6 +27,11 @@ body {
   width: min-content;
   text-align: center;
 }
+
+.hidden {
+  display: none;
+}
+
 button {
   width: max-content;
   margin: 5px auto;
@@ -38,10 +43,10 @@ button {
   background: none;
   border: 2px solid white;
   border-radius: 6px;
-  transition: all 0.5s linear;
+  transition: all 0.1s linear;
 }
 button:hover {
-  font-size: 28px;
+  font-size: 24px;
   background: linear-gradient(45deg,#B185A2, #4876FF);
   -webkit-box-shadow: -9px 21px 64px -13px rgba(0,0,0,0.6);
   -moz-box-shadow: -9px 21px 64px -13px rgba(0,0,0,0.6);
