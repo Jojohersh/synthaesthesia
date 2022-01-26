@@ -13,6 +13,9 @@ var colorData = {
     return this.chunks;
   }
 };
+
+setupPlayerButtons();
+
 //button opens the file input
 $("#fileButton").on("click", function() {
   $("#fileInput").trigger("click");
@@ -20,10 +23,15 @@ $("#fileButton").on("click", function() {
 
 //when the file input state changes check if it has the right kind of file
 $("#fileInput").on("change", async function() {
+  hidePlayerButtons();
   //stop current music
   Tone.Transport.stop();
+  Tone.Transport.position = 0;
+  Tone.Transport.cancel();
   //clear previously loaded music
   console.log(Tone.Transport);
+
+
   var file = $("#fileInput")[0].files[0];
   colorData.imageUrl = fileToDataUrl(file);
   draw(colorData.imageUrl);
@@ -41,27 +49,49 @@ $("#fileInput").on("change", async function() {
 
       colorData.formattedClips = await clips.map( clip => scribble.clip(clip));
       // console.log(scribbledClips);
-      showPlayButton();
+      showPlayerButtons();
     });
   }, 75);
 });
 
-function showPlayButton() {
-  var playButton = document.getElementById("play");
-  playButton.classList.remove("hidden");
-
-  playButton.addEventListener("click", async () => {
-    playSong(colorData.formattedClips);
-    console.log("play button clicked");
+function setupPlayerButtons() {
+  var playBtn = document.getElementById("play");
+  playBtn.addEventListener("click", () => {
+    playSong();
   });
+
+  var restartBtn = document.getElementById("restart");
+  restartBtn.addEventListener("click", () =>{
+    restartSong();
+  });
+
+  var pauseBtn = document.getElementById("pause");
+  pauseBtn.addEventListener("click", () =>{
+    pauseSong();
+  });
+
 }
 
-function hidePlayButton() {
-  var playButton = document.getElementById("play");
-  playButton.classList.add("hidden");
+function showPlayerButtons() {
+  var pauseBtn = document.getElementById("pause");
+  pauseBtn.classList.remove("hidden");
+  var restartBtn = document.getElementById("restart");
+  restartBtn.classList.remove("hidden");
+  var playBtn = document.getElementById("play");
+  playBtn.classList.remove("hidden");
+
 }
 
-function playSong(clips) {
+function hidePlayerButtons() {
+  var playBtn = document.getElementById("play");
+  playBtn.classList.add("hidden");
+  var restartBtn = document.getElementById("restart");
+  restartBtn.classList.add("hidden");
+  var pauseBtn = document.getElementById("pause");
+  pauseBtn.classList.add("hidden");
+}
+
+function playSong() {
   // maybe one day I'll have a drum backing track...
 
   // var drumKick = scribble.clip({
@@ -75,6 +105,8 @@ function playSong(clips) {
   // drumKick.loopEnd("100m");
 
   // clips.map(entry => entry.start());
+  clips = colorData.formattedClips;
+
   for(let i=0; i<clips.length; i++) {
     clips[i]._loop = false;
     clips[i].start(i + "m");
@@ -91,6 +123,15 @@ function playSong(clips) {
   });
 }
 
+function pauseSong() {
+  Tone.Transport.pause();
+}
+
+function restartSong() {
+  Tone.Transport.stop();
+  Tone.Transport.position = 0;
+  Tone.Transport.start();
+}
 
 //**************************************************************************
 // sends a fetch post request to server with the rgb data to be converted to
