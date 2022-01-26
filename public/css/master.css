@@ -1,25 +1,24 @@
 body {
-  background: #202d2a;
+  background: #202329;
 }
 #title {
   color: white;
   width: 100%;
   text-align: center;
 }
+#title span {
+  font-family: 'Monoton', cursive;
+}
 #title h1 {
   margin: 5px;
-  font-family: 'Bellota';
+  font-family: 'Averia Serif Libre', cursive;
   font-weight: bolder;
-  font-style: italic;
   font-size: 60px;
   text-shadow: -9px 21px 64px rgba(0,0,0,0.4);
 }
 #title h2 {
   margin: 0;
-  font-family: 'Montserrat';
-  font-weight: 100;
-  font-style: italic;
-  font-size: 24px;
+  font-family: 'Abril Fatface', cursive;
   text-shadow: -9px 21px 64px rgba(0,0,0,0.4);
 }
 #container {
