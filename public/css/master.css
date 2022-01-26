@@ -26,6 +26,9 @@ body {
   width: min-content;
   text-align: center;
 }
+#title p {
+  margin: 20px 15%;
+}
 
 .hidden {
   display: none;
