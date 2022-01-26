@@ -232,16 +232,16 @@ function adjustCanvas(image){
     colorData.chunkWidth = Math.floor(50 * aspRatio);
     colorData.chunkHeight = 50;
     width = Math.floor(aspRatio * 500);
-    canvas.width = width;
   } else {
     colorData.orientation = "portrait";
     var aspRatio = image.height / image.width;
     //adjust size of a chunk to ensure the canvas makes 100 chunks
     colorData.chunkHeight = Math.floor(50 * aspRatio);
     colorData.chunkWidth = 50;
-    height = aspRatio * 500;
-    canvas.height = height;
+    height = Math.floor(aspRatio * 500);
   }
+  canvas.width = width;
+  canvas.height = height;
 }
 // ***************************************************************
 // null grabColorData()
