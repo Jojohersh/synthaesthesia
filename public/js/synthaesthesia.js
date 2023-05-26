@@ -51,7 +51,7 @@ $("#fileInput").on("change", async function() {
       // console.log(scribbledClips);
       showPlayerButtons();
     });
-  }, 75);
+  }, 275);
 });
 
 function setupPlayerButtons() {
